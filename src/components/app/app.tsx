@@ -17,14 +17,21 @@ import {
   Register,
   ResetPassword,
 } from '@pages';
-import { fetchIngredients } from '@slices';
+import {
+  selectIngredients,
+  selectIngredientsLoading,
+  selectIngredientsError,
+} from '@selectors';
+import { checkAuth, fetchIngredients } from '@slices';
 import { Preloader } from '@ui';
+import { clsx } from 'clsx';
 import { useCallback, useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
 import { useDispatch, useSelector } from '@services/store';
 
 import type { AppContentProps } from './type';
+import type { Location } from 'react-router-dom';
 
 import '../../index.css';
 
@@ -32,9 +39,13 @@ import styles from './app.module.css';
 
 const App = (): React.JSX.Element => {
   const dispatch = useDispatch();
-  const ingredients = useSelector((state) => state.ingredients.ingredients);
-  const isIngredientsLoading = useSelector((state) => state.ingredients.isLoading);
-  const ingredientsError = useSelector((state) => state.ingredients.error);
+  const ingredients = useSelector(selectIngredients);
+  const isIngredientsLoading = useSelector(selectIngredientsLoading);
+  const ingredientsError = useSelector(selectIngredientsError);
+
+  useEffect(() => {
+    void dispatch(checkAuth());
+  }, [dispatch]);
 
   useEffect(() => {
     if (!ingredients.length && !isIngredientsLoading && !ingredientsError) {
@@ -56,20 +67,26 @@ const App = (): React.JSX.Element => {
 
 export default App;
 
-/* Маршруты показываются только когда ингредиенты загружены: без них не
-   отрисовать ни конструктор, ни состав заказа. */
 const AppContent = ({
   ingredients,
   isLoading,
   error,
 }: AppContentProps): React.JSX.Element => {
+  const { pathname } = useLocation();
+  const needsIngredients =
+    pathname === '/' ||
+    pathname.startsWith('/ingredients/') ||
+    pathname.startsWith('/feed');
+
+  if (!needsIngredients) return <RouteComponent />;
+
   if (isLoading) {
     return <Preloader />;
   }
 
   if (error) {
     return (
-      <p className={`${styles.message} text text_type_main-medium`}>
+      <p className={clsx(styles.message, 'text text_type_main-medium')}>
         Не удалось загрузить ингредиенты
         {error.message ? `: ${error.message}` : '.'}
       </p>
@@ -78,7 +95,9 @@ const AppContent = ({
 
   if (!ingredients.length) {
     return (
-      <p className={`${styles.message} text text_type_main-medium`}>Нет ингредиентов</p>
+      <p className={clsx(styles.message, 'text text_type_main-medium')}>
+        Нет ингредиентов
+      </p>
     );
   }
 
@@ -165,7 +184,7 @@ const RouteComponent = (): React.JSX.Element => {
         <Route
           path="/profile/orders/:number"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute isPrivate>
               <DetailsPage title="Детали заказа">
                 <OrderInfo />
               </DetailsPage>
@@ -195,7 +214,7 @@ const RouteComponent = (): React.JSX.Element => {
           <Route
             path="/profile/orders/:number"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isPrivate>
                 <Modal title="Детали заказа" onClose={handleModalClose}>
                   <OrderInfo />
                 </Modal>

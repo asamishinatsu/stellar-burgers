@@ -17,11 +17,7 @@ export const fetchIngredients = createAsyncThunk<TIngredient[], void>(
 const ingredientsSlice = createSlice({
   name: 'ingredients',
   initialState,
-  reducers: {
-    clearIngredientsError: (state) => {
-      state.error = null;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchIngredients.pending, (state) => {
@@ -39,5 +35,4 @@ const ingredientsSlice = createSlice({
   },
 });
 
-export const { clearIngredientsError } = ingredientsSlice.actions;
 export const ingredientsReducer = ingredientsSlice.reducer;

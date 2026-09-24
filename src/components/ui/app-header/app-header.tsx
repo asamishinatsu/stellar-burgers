@@ -13,7 +13,7 @@ import styles from './app-header.module.css';
 
 export const AppHeaderUI = ({ userName }: TAppHeaderUIProps): React.JSX.Element => (
   <header className={styles.header}>
-    <nav className={`${styles.menu} p-4`}>
+    <nav className={clsx(styles.menu, 'p-4')}>
       <div className={styles.menu_part_left}>
         <NavLink
           to="/"

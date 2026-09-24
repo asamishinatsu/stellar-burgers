@@ -1,3 +1,4 @@
+import { selectIngredients } from '@selectors';
 import { BurgerIngredientsUI } from '@ui';
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -11,7 +12,7 @@ export const BurgerIngredients = (): React.JSX.Element => {
   const titleBunRef = useRef<HTMLHeadingElement>(null);
   const titleMainRef = useRef<HTMLHeadingElement>(null);
   const titleSaucesRef = useRef<HTMLHeadingElement>(null);
-  const ingredients = useSelector((state) => state.ingredients.ingredients);
+  const ingredients = useSelector(selectIngredients);
 
   const [bunsRef, inViewBuns] = useInView({
     threshold: 0,
