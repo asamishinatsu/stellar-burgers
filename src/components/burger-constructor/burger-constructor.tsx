@@ -1,14 +1,15 @@
+import { clearConstructor } from '@/services/slices/constructorSlice';
 import { BurgerConstructorUI } from '@ui';
 import { useMemo } from 'react';
 
-import type { TConstructorIngredient, TConstructorState, TOrder } from '@utils-types';
+import { useDispatch, useSelector } from '@services/store';
+
+import type { TConstructorIngredient, TOrder } from '@utils-types';
 
 export const BurgerConstructor = (): React.JSX.Element | null => {
   /** TODO: Взять переменные constructorItems, orderRequest и orderModalData из стора */
-  const constructorItems: TConstructorState = {
-    bun: null,
-    ingredients: [],
-  };
+  const dispatch = useDispatch();
+  const constructorItems = useSelector((state) => state.constructor);
   const orderRequest = false;
   const orderModalData: TOrder | null = null;
 
@@ -19,6 +20,7 @@ export const BurgerConstructor = (): React.JSX.Element | null => {
 
   const closeOrderModal = (): void => {
     // TODO: Закрыть модальное окно и сбросить заказ
+    dispatch(clearConstructor());
   };
 
   const price = useMemo(
