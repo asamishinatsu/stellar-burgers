@@ -1,5 +1,4 @@
 import { addIngredient, setBun } from '@/services/slices/constructorSlice';
-import { nanoid } from '@reduxjs/toolkit';
 import { BurgerIngredientUI } from '@ui';
 import { memo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -16,11 +15,10 @@ export const BurgerIngredient = memo(function BurgerIngredient({
   const location = useLocation();
 
   const handleAdd = (): void => {
-    const item = { ...ingredient, id: nanoid() };
     if (ingredient.type === 'bun') {
-      dispatch(setBun(item));
+      dispatch(setBun(ingredient));
     } else {
-      dispatch(addIngredient(item));
+      dispatch(addIngredient(ingredient));
     }
   };
 

@@ -50,7 +50,7 @@ export type TIngredientsState = {
 };
 
 export type TConstructorState = {
-  bun: TConstructorIngredient | null;
+  bun: TIngredient | null;
   ingredients: TConstructorIngredient[];
 };
 
