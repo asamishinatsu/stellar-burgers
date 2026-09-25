@@ -26,7 +26,7 @@ import { checkAuth, fetchIngredients } from '@slices';
 import { Preloader } from '@ui';
 import { clsx } from 'clsx';
 import { useCallback, useEffect } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, useLocation, useMatch, useNavigate } from 'react-router-dom';
 
 import { useDispatch, useSelector } from '@services/store';
 
@@ -107,6 +107,10 @@ const AppContent = ({
 const RouteComponent = (): React.JSX.Element => {
   const location = useLocation();
   const navigate = useNavigate();
+  const feedOrderMatch = useMatch('/feed/:number');
+  const profileOrderMatch = useMatch('/profile/orders/:number');
+  const orderNumber = feedOrderMatch?.params.number ?? profileOrderMatch?.params.number;
+  const orderTitle = orderNumber ? `Детали заказа №${orderNumber}` : 'Детали заказа';
   const backgroundLocation = (location.state as { background?: Location } | null)
     ?.background;
 
@@ -128,7 +132,7 @@ const RouteComponent = (): React.JSX.Element => {
         <Route
           path="/feed/:number"
           element={
-            <DetailsPage title="Детали заказа">
+            <DetailsPage title={orderTitle}>
               <OrderInfo />
             </DetailsPage>
           }
@@ -185,7 +189,7 @@ const RouteComponent = (): React.JSX.Element => {
           path="/profile/orders/:number"
           element={
             <ProtectedRoute isPrivate>
-              <DetailsPage title="Детали заказа">
+              <DetailsPage title={orderTitle}>
                 <OrderInfo />
               </DetailsPage>
             </ProtectedRoute>
@@ -206,7 +210,7 @@ const RouteComponent = (): React.JSX.Element => {
           <Route
             path="/feed/:number"
             element={
-              <Modal title="Детали заказа" onClose={handleModalClose}>
+              <Modal title={orderTitle} onClose={handleModalClose}>
                 <OrderInfo />
               </Modal>
             }
@@ -215,7 +219,7 @@ const RouteComponent = (): React.JSX.Element => {
             path="/profile/orders/:number"
             element={
               <ProtectedRoute isPrivate>
-                <Modal title="Детали заказа" onClose={handleModalClose}>
+                <Modal title={orderTitle} onClose={handleModalClose}>
                   <OrderInfo />
                 </Modal>
               </ProtectedRoute>

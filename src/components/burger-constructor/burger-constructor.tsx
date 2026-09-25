@@ -30,6 +30,7 @@ export const BurgerConstructor = (): React.JSX.Element => {
     const ingredientIds = [
       constructorItems.bun._id,
       ...constructorItems.ingredients.map((item) => item._id),
+      constructorItems.bun._id,
     ];
     void dispatch(createOrder(ingredientIds)).then((action): void => {
       if (!createOrder.fulfilled.match(action)) return;
