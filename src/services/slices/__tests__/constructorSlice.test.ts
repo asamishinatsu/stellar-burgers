@@ -6,54 +6,58 @@ import {
   removeIngredient,
   setBun,
 } from '../constructorSlice';
-import { bun, filling, sauce } from './fixtures';
+import { bun, fillingInstance, sauce, sauceInstance } from './fixtures';
 
 describe('Редьюсер burgerConstructor', () => {
-  it('возвращает начальное состояние для неизвестного экшена', () => {
+  test('возвращает начальное состояние для неизвестного экшена', () => {
     expect(constructorReducer(undefined, { type: 'UNKNOWN' })).toEqual({
       bun: null,
       ingredients: [],
     });
   });
 
-  it('обрабатывает setBun', () => {
-    const state = { bun: null, ingredients: [filling] };
+  test('обрабатывает setBun без добавления id к булке', () => {
+    const state = { bun: null, ingredients: [fillingInstance] };
 
     expect(constructorReducer(state, setBun(bun))).toEqual({
       bun,
-      ingredients: [filling],
+      ingredients: [fillingInstance],
     });
   });
 
-  it('обрабатывает addIngredient', () => {
-    const state = { bun, ingredients: [filling] };
+  test('добавляет начинку и создаёт для неё id через prepare', () => {
+    const state = { bun, ingredients: [fillingInstance] };
+    const action = addIngredient(sauce);
 
-    expect(constructorReducer(state, addIngredient(sauce))).toEqual({
+    expect(action.payload).toMatchObject(sauce);
+    expect(typeof action.payload.id).toBe('string');
+    expect(action.payload.id).not.toHaveLength(0);
+    expect(constructorReducer(state, action)).toEqual({
       bun,
-      ingredients: [filling, sauce],
+      ingredients: [fillingInstance, action.payload],
     });
   });
 
-  it('обрабатывает removeIngredient', () => {
-    const state = { bun, ingredients: [filling, sauce] };
+  test('обрабатывает removeIngredient', () => {
+    const state = { bun, ingredients: [fillingInstance, sauceInstance] };
 
     expect(constructorReducer(state, removeIngredient(0))).toEqual({
       bun,
-      ingredients: [sauce],
+      ingredients: [sauceInstance],
     });
   });
 
-  it('обрабатывает moveIngredient', () => {
-    const state = { bun, ingredients: [filling, sauce] };
+  test('обрабатывает moveIngredient', () => {
+    const state = { bun, ingredients: [fillingInstance, sauceInstance] };
 
     expect(constructorReducer(state, moveIngredient({ from: 0, to: 1 }))).toEqual({
       bun,
-      ingredients: [sauce, filling],
+      ingredients: [sauceInstance, fillingInstance],
     });
   });
 
-  it('не меняет состояние при неверных индексах moveIngredient', () => {
-    const state = { bun, ingredients: [filling, sauce] };
+  test('не меняет состояние при неверных индексах moveIngredient', () => {
+    const state = { bun, ingredients: [fillingInstance, sauceInstance] };
 
     expect(constructorReducer(state, moveIngredient({ from: -1, to: 1 }))).toEqual(
       state
@@ -61,8 +65,8 @@ describe('Редьюсер burgerConstructor', () => {
     expect(constructorReducer(state, moveIngredient({ from: 0, to: 2 }))).toEqual(state);
   });
 
-  it('обрабатывает clearConstructor', () => {
-    const state = { bun, ingredients: [filling, sauce] };
+  test('обрабатывает clearConstructor', () => {
+    const state = { bun, ingredients: [fillingInstance, sauceInstance] };
 
     expect(constructorReducer(state, clearConstructor())).toEqual({
       bun: null,

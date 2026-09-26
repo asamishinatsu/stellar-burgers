@@ -1,10 +1,9 @@
-import type { TConstructorIngredient } from '@utils-types';
+import type { TConstructorIngredient, TIngredient } from '@utils-types';
 
-const image = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+const image = 'test-image.png';
 
-export const bun: TConstructorIngredient = {
+export const bun: TIngredient = {
   _id: 'test-bun-001',
-  id: 'bun-instance-001',
   name: 'Тестовая булка',
   type: 'bun',
   proteins: 10,
@@ -17,9 +16,8 @@ export const bun: TConstructorIngredient = {
   image_mobile: image,
 };
 
-export const filling: TConstructorIngredient = {
+export const filling: TIngredient = {
   _id: 'test-main-001',
-  id: 'main-instance-001',
   name: 'Тестовая начинка',
   type: 'main',
   proteins: 15,
@@ -32,9 +30,8 @@ export const filling: TConstructorIngredient = {
   image_mobile: image,
 };
 
-export const sauce: TConstructorIngredient = {
+export const sauce: TIngredient = {
   _id: 'test-sauce-001',
-  id: 'sauce-instance-001',
   name: 'Тестовый соус',
   type: 'sauce',
   proteins: 1,
@@ -45,4 +42,14 @@ export const sauce: TConstructorIngredient = {
   image,
   image_large: image,
   image_mobile: image,
+};
+
+export const fillingInstance: TConstructorIngredient = {
+  ...filling,
+  id: 'main-instance-001',
+};
+
+export const sauceInstance: TConstructorIngredient = {
+  ...sauce,
+  id: 'sauce-instance-001',
 };

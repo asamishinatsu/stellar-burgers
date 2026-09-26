@@ -2,7 +2,7 @@ import { fetchIngredients, ingredientsReducer } from '../ingredientsSlice';
 import { bun, filling } from './fixtures';
 
 describe('Редьюсер ingredients', () => {
-  it('возвращает начальное состояние для неизвестного экшена', () => {
+  test('возвращает начальное состояние для неизвестного экшена', () => {
     expect(ingredientsReducer(undefined, { type: 'UNKNOWN' })).toEqual({
       ingredients: [],
       isLoading: false,
@@ -10,7 +10,7 @@ describe('Редьюсер ingredients', () => {
     });
   });
 
-  it('обрабатывает fetchIngredients.pending', () => {
+  test('обрабатывает fetchIngredients.pending', () => {
     const state = {
       ingredients: [bun],
       isLoading: false,
@@ -26,7 +26,7 @@ describe('Редьюсер ingredients', () => {
     });
   });
 
-  it('обрабатывает fetchIngredients.fulfilled', () => {
+  test('обрабатывает fetchIngredients.fulfilled', () => {
     const state = {
       ingredients: [bun],
       isLoading: true,
@@ -45,7 +45,7 @@ describe('Редьюсер ingredients', () => {
     });
   });
 
-  it('обрабатывает fetchIngredients.rejected', () => {
+  test('обрабатывает fetchIngredients.rejected', () => {
     const state = {
       ingredients: [bun],
       isLoading: true,
