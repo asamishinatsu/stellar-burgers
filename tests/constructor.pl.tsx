@@ -1,8 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-const bun = { id: 'test-bun-001', name: 'Тестовая булка' };
-const filling = { id: 'test-main-001', name: 'Тестовая начинка' };
-const sauce = { id: 'test-sauce-001', name: 'Тестовый соус' };
+const bun = { _id: 'test-bun-001', name: 'Тестовая булка' };
+const filling = {
+  _id: 'test-main-001',
+  name: 'Тестовая начинка',
+  calories: 150,
+};
+const sauce = { _id: 'test-sauce-001', name: 'Тестовый соус' };
 const orderNumber = 12345;
 const accessToken = 'Bearer test-access-token';
 
@@ -77,9 +81,11 @@ test.describe('Конструктор бургера', () => {
       modal.getByRole('heading', { name: 'Детали ингредиента' })
     ).toBeVisible();
     await expect(modal.getByRole('heading', { name: filling.name })).toBeVisible();
-    await expect(modal.getByText('150', { exact: true })).toBeVisible();
+    await expect(
+      modal.getByText(String(filling.calories), { exact: true })
+    ).toBeVisible();
     await expect(modal.getByRole('heading', { name: bun.name })).toHaveCount(0);
-    await expect(page).toHaveURL(/\/ingredients\/test-main-001$/);
+    await expect(page).toHaveURL(new RegExp(`/ingredients/${filling._id}$`));
 
     await modal.getByRole('button', { name: 'Закрыть' }).click();
     await expect(modal.getByRole('heading', { name: 'Детали ингредиента' })).toHaveCount(
@@ -145,7 +151,9 @@ test.describe('Конструктор бургера', () => {
     await constructor.getByRole('button', { name: 'Оформить заказ' }).click();
     const request = await orderRequest;
     expect(request.headers().authorization).toBe(accessToken);
-    expect(request.postDataJSON()).toEqual({ ingredients: [bun.id, filling.id] });
+    expect(request.postDataJSON()).toEqual({
+      ingredients: [bun._id, filling._id, bun._id],
+    });
 
     const modal = page.locator('#modals');
     await expect(modal.getByTestId('order-number')).toHaveText(String(orderNumber));
