@@ -1,10 +1,10 @@
+const MILLISECONDS_IN_SECOND = 1000;
+
 export function getCookie(name: string): string | undefined {
-  const matches = new RegExp(
-    '(?:^|; )' +
-      // eslint-disable-next-line no-useless-escape
-      name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') +
-      '=([^;]*)'
-  ).exec(document.cookie);
+  const escapedName = name.replace(/[.*+?^{}$()|[\]\\]/g, '\\$&');
+  const matches = new RegExp('(?:^|; )' + escapedName + '=([^;]*)').exec(
+    document.cookie
+  );
   return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
@@ -25,7 +25,7 @@ export function setCookie(
   let exp = props.expires;
   if (exp && typeof exp === 'number') {
     const d = new Date();
-    d.setTime(d.getTime() + exp * 1000);
+    d.setTime(d.getTime() + exp * MILLISECONDS_IN_SECOND);
     exp = props.expires = d;
   }
 

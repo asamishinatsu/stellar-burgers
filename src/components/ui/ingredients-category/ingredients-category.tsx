@@ -11,19 +11,23 @@ export const IngredientsCategoryUI = ({
   ingredientsCounters,
   ref,
   ...rest
-}: TIngredientsCategoryUIProps): React.JSX.Element => (
-  <>
-    <h3 className="text text_type_main-medium mt-10 mb-6" ref={titleRef}>
-      {title}
-    </h3>
-    <ul className={styles.items} ref={ref} {...rest}>
-      {ingredients.map((ingredient) => (
-        <BurgerIngredient
-          ingredient={ingredient}
-          key={ingredient._id}
-          count={ingredientsCounters[ingredient._id]}
-        />
-      ))}
-    </ul>
-  </>
-);
+}: TIngredientsCategoryUIProps): React.JSX.Element => {
+  const ingredientElements = ingredients.map((ingredient) => (
+    <BurgerIngredient
+      ingredient={ingredient}
+      key={ingredient._id}
+      count={ingredientsCounters[ingredient._id]}
+    />
+  ));
+
+  return (
+    <>
+      <h3 className="text text_type_main-medium mt-10 mb-6" ref={titleRef}>
+        {title}
+      </h3>
+      <ul className={styles.items} ref={ref} {...rest}>
+        {ingredientElements}
+      </ul>
+    </>
+  );
+};

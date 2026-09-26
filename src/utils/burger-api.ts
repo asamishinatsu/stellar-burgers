@@ -1,6 +1,6 @@
 import { setCookie, getCookie } from './cookie';
 
-import type { TIngredient, TOrder, TUser } from './types';
+import type { TIngredient, TOrder, TOrdersData, TProfileForm, TUser } from './types';
 
 const URL = process.env.BURGER_API_URL;
 
@@ -81,11 +81,7 @@ type TIngredientsResponse = TServerResponse<{
   data: TIngredient[];
 }>;
 
-type TFeedsResponse = TServerResponse<{
-  orders: TOrder[];
-  total: number;
-  totalToday: number;
-}>;
+type TFeedsResponse = TServerResponse<TOrdersData>;
 
 export const getIngredientsApi = (): Promise<TIngredient[]> =>
   fetch(`${URL}/ingredients`)
@@ -103,9 +99,10 @@ export const getFeedsApi = (): Promise<TFeedsResponse> =>
       return Promise.reject(toApiError(data));
     });
 
-export const getOrdersApi = (): Promise<TOrder[]> =>
-  fetchWithRefresh<TFeedsResponse>(`${URL}/orders`, {
+export const getOrdersApi = (signal?: AbortSignal): Promise<TOrder[]> =>
+  fetchWithRefresh<TOrderResponse>(`${URL}/orders`, {
     method: 'GET',
+    signal,
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
       authorization: getCookie('accessToken'),
@@ -139,19 +136,19 @@ type TOrderResponse = TServerResponse<{
   orders: TOrder[];
 }>;
 
-export const getOrderByNumberApi = (number: number): Promise<TOrderResponse> =>
+export const getOrderByNumberApi = (
+  number: number,
+  signal?: AbortSignal
+): Promise<TOrderResponse> =>
   fetch(`${URL}/orders/${number}`, {
     method: 'GET',
+    signal,
     headers: {
       'Content-Type': 'application/json',
     },
   }).then((res) => checkResponse<TOrderResponse>(res));
 
-export type TRegisterData = {
-  email: string;
-  name: string;
-  password: string;
-};
+export type TRegisterData = TProfileForm;
 
 type TAuthResponse = TServerResponse<{
   refreshToken: string;
@@ -173,10 +170,7 @@ export const registerUserApi = (data: TRegisterData): Promise<TAuthResponse> =>
       return Promise.reject(toApiError(data));
     });
 
-export type TLoginData = {
-  email: string;
-  password: string;
-};
+export type TLoginData = Pick<TProfileForm, 'email' | 'password'>;
 
 export const loginUserApi = (data: TLoginData): Promise<TAuthResponse> =>
   fetch(`${URL}/auth/login`, {
@@ -230,6 +224,9 @@ export const getUserApi = (): Promise<TUserResponse> =>
     headers: {
       authorization: getCookie('accessToken'),
     } as HeadersInit,
+  }).then((data) => {
+    if (data?.success) return data;
+    return Promise.reject(toApiError(data));
   });
 
 export const updateUserApi = (user: Partial<TRegisterData>): Promise<TUserResponse> =>
@@ -240,6 +237,9 @@ export const updateUserApi = (user: Partial<TRegisterData>): Promise<TUserRespon
       authorization: getCookie('accessToken'),
     } as HeadersInit,
     body: JSON.stringify(user),
+  }).then((data) => {
+    if (data?.success) return data;
+    return Promise.reject(toApiError(data));
   });
 
 export const logoutApi = (): Promise<TServerResponse> =>
@@ -251,4 +251,9 @@ export const logoutApi = (): Promise<TServerResponse> =>
     body: JSON.stringify({
       token: localStorage.getItem('refreshToken'),
     }),
-  }).then((res) => checkResponse<TServerResponse>(res));
+  })
+    .then((res) => checkResponse<TServerResponse>(res))
+    .then((data) => {
+      if (data?.success) return data;
+      return Promise.reject(toApiError(data));
+    });

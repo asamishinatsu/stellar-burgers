@@ -1,12 +1,28 @@
+import { logoutUser } from '@slices';
 import { ProfileMenuUI } from '@ui';
-import { useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import { useDispatch } from '@services/store';
 
 export const ProfileMenu = (): React.JSX.Element => {
   const { pathname } = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   const handleLogout = (): void => {
-    // TODO: Разлогинить пользователя
+    setError('');
+    void dispatch(logoutUser())
+      .unwrap()
+      .then(() => void navigate('/login', { replace: true }))
+      .catch((requestError: Error) => setError(requestError.message));
   };
 
-  return <ProfileMenuUI handleLogout={handleLogout} pathname={pathname} />;
+  return (
+    <>
+      <ProfileMenuUI handleLogout={handleLogout} pathname={pathname} />
+      {error && <p role="alert">{error}</p>}
+    </>
+  );
 };
